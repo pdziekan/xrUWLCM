@@ -2,13 +2,57 @@ import xarray as xr
 from functools import partial
 import numpy as np
 
+
+VARIABLE_METADATA = {
+    "rv": {"units": "kg kg-1", "long_name": "water vapor mixing ratio", "standard_name": "specific_humidity"},
+    "th": {"units": "K", "long_name": "dry-air potential temperature", "standard_name": "air_potential_temperature"},
+    "u": {"units": "m s-1", "long_name": "zonal wind", "standard_name": "eastward_wind"},
+    "v": {"units": "m s-1", "long_name": "meridional wind", "standard_name": "northward_wind"},
+    "w": {"units": "m s-1", "long_name": "vertical wind", "standard_name": "upward_air_velocity"},
+    "rhod": {"units": "kg m-3", "long_name": "dry-air density", "standard_name": "air_density"},
+    "RH": {"units": "%", "long_name": "relative humidity", "standard_name": "relative_humidity"},
+    "rc": {"units": "kg kg-1", "long_name": "cloud water mixing ratio"},
+    "rr": {"units": "kg kg-1", "long_name": "rain water mixing ratio"},
+    "nc": {"units": "kg-1", "long_name": "cloud droplet number concentration"},
+    "nr": {"units": "kg-1", "long_name": "rain drop number concentration"},
+    "precip_rate": {"units": "kg m-2 s-1", "long_name": "precipitation rate"},
+    "sd_conc": {"units": "1", "long_name": "number of super-droplets per grid cell"},
+}
+
+MOMENT_GROUPS = {
+    "all": "all hydrometeors",
+    "aerosol": "aerosols",
+    "cloud": "cloud droplets",
+    "rain": "rain drops",
+    "actrw": "activated droplets",
+}
+
+
+def set_variable_metadata(ds):
+    for name, variable in ds.variables.items():
+        metadata = VARIABLE_METADATA.get(name)
+        if metadata is None:
+            for group, description in MOMENT_GROUPS.items():
+                prefix = group + "_rw_mom"
+                if name.startswith(prefix) and name[len(prefix):].isdigit():
+                    moment = int(name[len(prefix):])
+                    metadata = {
+                        "units": "kg-1" if moment == 0 else "m" + str(moment) + " kg-1",
+                        "long_name": "moment " + str(moment) + " of wet radius for " + description,
+                    }
+                    break
+        if metadata is not None:
+            for attribute, value in metadata.items():
+                variable.attrs.setdefault(attribute, value)
+    return ds
+
 # returns:
 # data - constants and all timesteps with DSD vars dropped
 # data_DSD - only timesteps that have DSD vars, from constants only rhod to facilitate calculations of derived variables
 def load_outdir(datadir, engine=None):
     const = load_const(datadir, engine)
-    data = xr.merge([const.drop_vars(["th_LS", "rv_LS"]), load_timesteps(datadir, const, engine)], combine_attrs="no_conflicts").chunk({"t" : 1}) #set chunk for dask, each task executes takes one file; th_LS and rv_LS dropped from const, becasue they ares stored in timesteps
-    data_DSD = xr.merge([const, load_DSD(datadir, const, engine)]).chunk({"t" : 1}) #set chunk for dask, each task executes takes one file
+    data = set_variable_metadata(xr.merge([const.drop_vars(["th_LS", "rv_LS"]), load_timesteps(datadir, const, engine)], combine_attrs="no_conflicts")).chunk({"t" : 1}) #set chunk for dask, each task executes takes one file; th_LS and rv_LS dropped from const, becasue they ares stored in timesteps
+    data_DSD = set_variable_metadata(xr.merge([const, load_DSD(datadir, const, engine)])).chunk({"t" : 1}) #set chunk for dask, each task executes takes one file
     # hardcoded for now, TODO: output it in const in UWLCM
     data.attrs["aerosol definition"] = "rw < 0.5 microns"
     data.attrs["cloud droplet definition"] = "0.5 microns < rw < 25 microns"
