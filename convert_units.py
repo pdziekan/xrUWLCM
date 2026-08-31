@@ -4,6 +4,7 @@ def convert_units(ds):
         "rl" : (1e3, "g/kg"),
         "rt" : (1e3, "g/kg"),
         "rc" : (1e3, "g/kg"),
+        "ri" : (1e3, "g/kg"),
         "r_i" : (1e3, "g/kg"),
         "rr" : (1e3, "g/kg"),
         "ria" : (1e3, "g/kg"),
@@ -21,6 +22,7 @@ def convert_units(ds):
         "na" : (1e-6, '1/mg'),
         "nc" : (1e-6, '1/mg'),
         "nr" : (1e-6, '1/mg'),
+        "ni" : (1e-6, '1/mg'),
         "ra" : (1e3, "g/kg"),
         "all_r_m6" : (1e18, "mm$^6$/m$^3$"),
     }

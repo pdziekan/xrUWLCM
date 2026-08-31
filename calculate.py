@@ -13,6 +13,7 @@ def calc_all(ds):
     .pipe(calc_RH) \
     .pipe(calc_na) \
     .pipe(calc_nc) \
+    .pipe(calc_ni) \
     .pipe(calc_nr) \
     .pipe(calc_rr) \
     .pipe(calc_cloud_r_mean) \
@@ -231,7 +232,21 @@ def calc_nr(ds):
         dsn = ds.assign(nr=nr)
     dsn.nr.attrs["units"] = "1/kg"
     dsn.nr.attrs["long_name"] = "number concentration of rain drops"
-    return dsn    
+    return dsn
+    
+# number concentration of ice crystals [1/kg]
+def calc_ni(ds):
+    dsn = ds
+    if ds.microphysics != 'double-moment bulk':    
+        if ds.microphysics == "super-droplets" and "ice_mom0" in ds:
+            ni=lambda x: x.ice_mom0
+        else:
+            ni=np.nan
+        dsn = ds.assign(ni=ni)
+    dsn.ni.attrs["units"] = "1/kg"
+    dsn.ni.attrs["long_name"] = "number concentration of ice crystals"
+    return dsn
+
    
 # 6th moment of droplet radius[m^6/m^3]
 def calc_all_r_m6(ds):
