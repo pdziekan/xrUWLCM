@@ -13,6 +13,7 @@ VARIABLE_METADATA = {
     "RH": {"units": "%", "long_name": "relative humidity", "standard_name": "relative_humidity"},
     "rc": {"units": "kg kg-1", "long_name": "cloud water mixing ratio"},
     "rr": {"units": "kg kg-1", "long_name": "rain water mixing ratio"},
+    "r_i": {"units": "kg kg-1", "long_name": "ice water mixing ratio"},
     "nc": {"units": "kg-1", "long_name": "cloud droplet number concentration"},
     "nr": {"units": "kg-1", "long_name": "rain drop number concentration"},
     "precip_rate": {"units": "kg m-2 s-1", "long_name": "precipitation rate"},

@@ -4,6 +4,7 @@ def convert_units(ds):
         "rl" : (1e3, "g/kg"),
         "rt" : (1e3, "g/kg"),
         "rc" : (1e3, "g/kg"),
+        "r_i" : (1e3, "g/kg"),
         "rr" : (1e3, "g/kg"),
         "ria" : (1e3, "g/kg"),
         "rib" : (1e3, "g/kg"),
