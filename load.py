@@ -4,22 +4,22 @@ import numpy as np
 
 
 VARIABLE_METADATA = {
-    "rv": {"units": "kg kg-1", "long_name": "water vapor mixing ratio", "standard_name": "specific_humidity"},
-    "th": {"units": "K", "long_name": "dry-air potential temperature", "standard_name": "air_potential_temperature"},
-    "u": {"units": "m s-1", "long_name": "zonal wind", "standard_name": "eastward_wind"},
-    "v": {"units": "m s-1", "long_name": "meridional wind", "standard_name": "northward_wind"},
-    "w": {"units": "m s-1", "long_name": "vertical wind", "standard_name": "upward_air_velocity"},
-    "rhod": {"units": "kg m-3", "long_name": "dry-air density", "standard_name": "air_density"},
-    "RH": {"units": "%", "long_name": "relative humidity", "standard_name": "relative_humidity"},
-    "rc": {"units": "kg kg-1", "long_name": "cloud water mixing ratio"},
-    "rr": {"units": "kg kg-1", "long_name": "rain water mixing ratio"},
-    "ri": {"units": "kg kg-1", "long_name": "ice water mixing ratio"},
-    "r_i": {"units": "kg kg-1", "long_name": "ice water mixing ratio"},
-    "nc": {"units": "kg-1", "long_name": "cloud droplet number concentration"},
-    "ni": {"units": "kg-1", "long_name": "ice crystals number concentration"},
-    "nr": {"units": "kg-1", "long_name": "rain drop number concentration"},
-    "precip_rate": {"units": "kg m-2 s-1", "long_name": "precipitation rate"},
-    "sd_conc": {"units": "1", "long_name": "number of super-droplets per grid cell"},
+    "rv": {"units": "1", "long_name": "water vapor mixing ratio", "standard_name": r'$r_v$'},
+    "th": {"units": "K", "long_name": "dry-air potential temperature", "standard_name": r'$\theta$'},
+    "u": {"units": r"m$\, $s$^{-1}$", "long_name": "zonal wind", "standard_name": r"$u$"},
+    "v": {"units": r"m$\, $s$^{-1}$", "long_name": "meridional wind", "standard_name": r"$v$"},
+    "w": {"units": r"m$\, $s$^{-1}$", "long_name": "vertical wind", "standard_name": r"$w$"},
+    "rhod": {"units": r"kg$\, $m$^{-3}$", "long_name": "dry-air density", "standard_name": r"$\rho_d$"},
+    "RH": {"units": "%", "long_name": "relative humidity", "standard_name": "RH"},
+    "rc": {"units": "1", "long_name": "cloud water mixing ratio", "standard_name": r'$r_c$'},
+    "rr": {"units": "1", "long_name": "rain water mixing ratio", "standard_name": r'$r_r$'},
+    "ri": {"units": "1", "long_name": "ice water mixing ratio", "standard_name": r'$r_i$'},
+    "r_i": {"units": "1", "long_name": "ice water mixing ratio", "standard_name": r'$r_i$'},
+    "nc": {"units": r"kg$^{-1}$", "long_name": "cloud droplet number concentration", "standard_name": r'$n_c$'},
+    "ni": {"units": r"kg$^{-1}$", "long_name": "ice crystals number concentration", "standard_name": r'$n_i$'},
+    "nr": {"units": r"kg$^{-1}$", "long_name": "rain drop number concentration", "standard_name": r'$n_r$'},
+    "precip_rate": {"units": r"kg$\, $m$^{-2}$$\, $s$^{-1}$", "long_name": "precipitation rate", "standard_name": r'$P$'},
+    "sd_conc": {"units": "1", "long_name": "number of super-droplets per grid cell", "standard_name": r'$N_\mathrm{SD}$'},
 }
 
 MOMENT_GROUPS = {

@@ -14,7 +14,7 @@ def calc_spectrum(ds, axs, res, exp): # dataset, axes over which fft is done, gr
     for ax, ax2 in zip(axs, reversed(axs)): # axis along which we calculate fft and the perpendicular axis
         K.append(np.fft.rfftfreq(ds.shape[ax]) / res)
         lmbd.append(1 / K[-1])
-        wk = np.fft.rfft(ds, axis = ax)#, norm='forward')
+        wk = np.fft.rfft(ds, axis = ax, norm='forward')
         E.append(np.mean(np.abs(wk) ** exp, axis = ax2))
     return E, K, lmbd
 
@@ -35,7 +35,7 @@ def spectrum_average(E, K, lmbd):  # arguments are the output of calc_spectrum
 def calc_spectrum2d(ds, axs, res, exp): # dataset, axes over which fft is done, grid resolution, amplitude (exp=1) or power (exp=2) spectrum
     assert(len(axs)==2) # spectrum is calculated over a horizontal slice   
     shift = np.fft.fftshift
-    wk = shift(np.fft.fft2(ds, axes = axs))#, norm='forward'))
+    wk = shift(np.fft.fft2(ds, axes = axs, norm='forward'))
     E = np.abs(wk) ** exp
     ky = shift(np.fft.fftfreq(ds.shape[axs[0]], res)) #* 2 * np.pi
     #kx = np.fft.rfftfreq(ds.shape[axs[1]]) / res #* 2 * np.pi # in 2d fft, real transform is done over the last axis
