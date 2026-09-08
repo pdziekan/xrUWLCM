@@ -1,4 +1,5 @@
 import xarray as xr
+from xarray.backends.plugins import guess_engine
 from functools import partial
 import numpy as np
 
@@ -49,6 +50,12 @@ def set_variable_metadata(ds):
                 variable.attrs.setdefault(attribute, value)
     return ds
 
+def set_engine_kwargs(filepath, engine):
+    # Set h5netcdf-specific options
+    target_engine = engine or guess_engine(filepath)    
+    kwargs = {'phony_dims': 'sort'} if target_engine=='h5netcdf' else {} # h5netcdf-specific option
+    return kwargs
+
 # returns:
 # data - constants and all timesteps with DSD vars dropped
 # data_DSD - only timesteps that have DSD vars, from constants only rhod to facilitate calculations of derived variables
@@ -67,8 +74,9 @@ def load_outdir(datadir, engine=None):
     return data, data_DSD
 
 def load_const(datadir, engine=None):
-    open_dataset_kwargs = {'phony_dims': 'sort'} if engine=='h5netcdf' else {} # h5netcdf-specific option
-    const = xr.open_dataset(datadir + "const.h5", engine=engine, **open_dataset_kwargs)
+    filepath = datadir + "const.h5"
+    open_dataset_kwargs = set_engine_kwargs(filepath, engine)
+    const = xr.open_dataset(filepath, engine=engine, **open_dataset_kwargs)
 
     if len(const.G.dims)==3: # 3D
         const = const.rename({const.G.dims[0] : "x", const.G.dims[1] : "y", const.G.dims[2] : "z"})
@@ -133,10 +141,10 @@ def load_const(datadir, engine=None):
 
 
 def load_timesteps(datadir, const, engine=None):
-    open_dataset_kwargs = {'phony_dims': 'sort'} if engine=='h5netcdf' else {} # h5netcdf-specific option
     filenames = []
     for t in const.T.values:
         filename=datadir + "timestep"+str(int(t / (const.dt))).zfill(10)+".h5"
+        open_dataset_kwargs = set_engine_kwargs(filename, engine) if t == const.T.values[0] else open_dataset_kwargs
         try:
             xr.open_dataset(filename, engine=engine, **open_dataset_kwargs)
             filenames.append(filename)
@@ -148,10 +156,10 @@ def load_timesteps(datadir, const, engine=None):
 
 #load size spectra
 def load_DSD(datadir, const, engine=None):
-    open_dataset_kwargs = {'phony_dims': 'sort'} if engine=='h5netcdf' else {} # h5netcdf-specific option
     filenames = []
     for t in const.T.values:
         filename=datadir + "timestep"+str(int(t / (const.dt))).zfill(10)+".h5"
+        open_dataset_kwargs = set_engine_kwargs(filename, engine) if t == const.T.values[0] else open_dataset_kwargs
         try:
             ds = xr.open_dataset(filename, engine=engine, **open_dataset_kwargs)
             if 'rw_rng000_mom0' in ds.variables:
@@ -167,9 +175,7 @@ def load_DSD(datadir, const, engine=None):
     #return xr.open_mfdataset(filenames, parallel=False, preprocess=_squeeze_and_set_time)
 
 
-def squeeze_and_set_time(ds, const, drop_DSD, engine=None):
-    open_dataset_kwargs = {'phony_dims': 'sort'} if engine=='h5netcdf' else {} # h5netcdf-specific option
-    
+def squeeze_and_set_time(ds, const, drop_DSD, engine=None):    
     ds = ds.expand_dims("t")
     #get time from filename
     t = np.float32(ds.encoding["source"][-13:-3]) * const.dt 
@@ -218,6 +224,7 @@ def squeeze_and_set_time(ds, const, drop_DSD, engine=None):
     ds.z.attrs["long_name"] = "height"
     
     #read puddle
+    open_dataset_kwargs = set_engine_kwargs(ds.encoding["source"], engine)
     ds_puddle = xr.open_dataset(ds.encoding["source"], group="/puddle/", engine=engine, **open_dataset_kwargs)
     ds_puddle = ds_puddle.assign(ds_puddle.attrs) # convert data stored in attributes to variables
     for name in ds_puddle.attrs:
